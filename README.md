@@ -11,7 +11,7 @@ I don't have enough computational power for training heavy models like this unde
 I trained the model for a few iterations (one story per iteration) on solely induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). Some of the iterations with predicated and target outputs are visible in
 the ipynb file. However, training is far from complete.
 
-The model wasn't tested on validation or test data set.
+This particular implementation of the model wasn't tested on validation or test data set.
 
 
 
