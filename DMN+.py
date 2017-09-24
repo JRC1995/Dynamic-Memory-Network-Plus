@@ -691,8 +691,8 @@ with tf.Session() as sess: # Start Tensorflow Session
         val_acc_list.append(avg_val_acc) # Storing values in list for plotting later on.
     
 
-        print "\nIter " + str(step) + ", Validation Loss= " +                 "{:.3f}".format(avg_val_loss) + ", validation Accuracy= " +                 "{:.3f}%".format(avg_val_acc*100)+""
-        print "Iter " + str(step) + ", Average Training Loss= " +               "{:.3f}".format(avg_loss) + ", Average Training Accuracy= " +               "{:.3f}%".format(avg_acc*100)+""
+        print "\nIter " + str(step) + ", Validation Loss= "+"{:.3f}".format(avg_val_loss) + ", validation Accuracy= "+"{:.3f}%".format(avg_val_acc*100)+""
+        print "Iter " + str(step) + ", Average Training Loss= "+"{:.3f}".format(avg_loss) + ", Average Training Accuracy= "+"{:.3f}%".format(avg_acc*100)+""
                     
         if avg_val_acc > best_val_acc: # When better accuracy is received than previous best validation accuracy
                 
