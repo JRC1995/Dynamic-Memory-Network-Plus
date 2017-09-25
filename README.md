@@ -2,7 +2,7 @@
 
 This is a rough 'untested' implementation of Dynamic Memory Network Plus (for question answering) using Tensorflow.
 
-The model is based on this [paper](https://arxiv.org/abs/1603.01417). 
+The model is based on this [paper](https://arxiv.org/abs/1603.01417). The answer module is described in this [paper](https://arxiv.org/pdf/1506.07285.pdf).
 
 I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.edu/projects/glove/).
 
