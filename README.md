@@ -1,6 +1,6 @@
 # Implementation of Dynamic Memory Network Plus
 
-This is a rough 'untested' implementation of Dynamic Memory Network Plus using Tensorflow.
+This is a rough 'untested' implementation of Dynamic Memory Network Plus (for question answering) using Tensorflow.
 
 The model is based on this [paper](https://arxiv.org/abs/1603.01417). 
 
