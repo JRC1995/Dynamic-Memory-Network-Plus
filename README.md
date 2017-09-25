@@ -9,7 +9,7 @@ I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.e
 I don't have enough computational power for training heavy models like this under a reasonable time.
 
 I trained the model for a few iterations (one story per iteration) on solely induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). Some of the iterations with predicted outputs and target outputs are visible in
-the ipynb file. However, training is far from complete.
+the ipynb file - it shows the model in some action. However, training is far from complete.
 
 This particular implementation of the model wasn't tested on validation or test data set.
 
