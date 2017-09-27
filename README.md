@@ -13,7 +13,7 @@ the ipynb file - it shows the model in some action. However, training is far fro
 
 This implementation wasn't tested on validation or test data set.
 
-Caution: I haven't implemented any regularization.
+
 
 
 
