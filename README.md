@@ -16,11 +16,11 @@ This implementation wasn't tested on validation or test data set.
 Here are some of the training iterations:
 
 
->Iter 0, Loss= 12.458, Predicted Answer= vlaeminck, Actual Answer= green
->Iter 100, Loss= 3.438, Predicted Answer= yellow, Actual Answer= green
->Iter 200, Loss= 1.613, Predicted Answer= gray, Actual Answer= white
->Iter 300, Loss= 3.093, Predicted Answer= yellow, Actual Answer= white
->Iter 400, Loss= 2.933, Predicted Answer= gray, Actual Answer= white
+>Iter 0, Loss= 12.458, Predicted Answer= vlaeminck, Actual Answer= green__
+>Iter 100, Loss= 3.438, Predicted Answer= yellow, Actual Answer= green__
+>Iter 200, Loss= 1.613, Predicted Answer= gray, Actual Answer= white__
+>Iter 300, Loss= 3.093, Predicted Answer= yellow, Actual Answer= white__
+>Iter 400, Loss= 2.933, Predicted Answer= gray, Actual Answer= white__
 >Iter 500, Loss= 0.767, Predicted Answer= yellow, Actual Answer= yellow
 
 
