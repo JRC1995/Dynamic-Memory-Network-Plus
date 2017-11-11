@@ -23,10 +23,6 @@ Here are some of the training iterations:
 >Iter 400, Loss= 2.933, Predicted Answer= gray, Actual Answer= white <br/>
 >Iter 500, Loss= 0.767, Predicted Answer= yellow, Actual Answer= yellow
 
+I jupyter notebook version looks ugly on github. I commented it to death (didn't know about ability to insert markdown cells in Jupyter back then).
 
-
-
-
-
-
-
+The .py version of the same code may appear aesthetically slighly more pleasing. 
