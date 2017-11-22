@@ -79,7 +79,7 @@ print test_answers.shape
     
 
 
-# ### CREATING TRAINING AND CROSS-VALIDATION DATA
+# ### CREATING TRAINING AND VALIDATION DATA
 
 # In[2]:
 
@@ -93,7 +93,7 @@ val_fact_stories = []
 val_questions = []
 val_answers = []
 
-p=90 
+p=90 #(90% data used for training. Rest for validation)
     
 train_len = int((p/100)*len(fact_stories))
 val_len = int(((100-p)/100)*len(fact_stories))
@@ -225,10 +225,12 @@ epochs = 256
 learning_rate = 0.001
 hidden_size = 100
 passes = 3
-beta = 1e-4 #l2 regularization scale
+beta = 0.0001 #l2 regularization scale
 
 
 # ### Low level api implementation of GRU
+# 
+# Returns a tensor of all the hidden states
 
 # In[7]:
 
@@ -267,6 +269,8 @@ def GRU(inp,hidden,
 
 
 # ### Attention based GRU as used in DMN+ model
+# 
+# Returns only the final hidden state.
 
 # In[8]:
 
@@ -309,43 +313,43 @@ def attention_based_GRU(inp,hidden,
 # FORWARD GRU PARAMETERS FOR INPUT MODULE
 
 wzf = tf.get_variable("wzf", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uzf = tf.get_variable("uzf", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+uzf = tf.get_variable("uzf", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bzf = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 wrf = tf.get_variable("wrf", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-urf = tf.get_variable("urf", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+urf = tf.get_variable("urf", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 brf = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 wf = tf.get_variable("wf", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uf = tf.get_variable("uf", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+uf = tf.get_variable("uf", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bf = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 # BACKWARD GRU PARAMETERS FOR INPUT MODULE
 
 wzb = tf.get_variable("wzb", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uzb = tf.get_variable("uzb", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+uzb = tf.get_variable("uzb", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bzb = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 wrb = tf.get_variable("wrb", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-urb = tf.get_variable("urb", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+urb = tf.get_variable("urb", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 brb = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 wb = tf.get_variable("wb", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-ub = tf.get_variable("ub", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+ub = tf.get_variable("ub", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bb = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 # GRU PARAMETERS FOR QUESTION MODULE (TO ENCODE THE QUESTIONS)
 
 wzq = tf.get_variable("wzq", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uzq = tf.get_variable("uzq", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+uzq = tf.get_variable("uzq", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bzq = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 wrq = tf.get_variable("wrq", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-urq = tf.get_variable("urq", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+urq = tf.get_variable("urq", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 brq = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 wq = tf.get_variable("wq", shape=[word_vec_dim, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uq = tf.get_variable("uq", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+uq = tf.get_variable("uq", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bq = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 
@@ -360,11 +364,11 @@ b2 = tf.Variable(tf.random_uniform(shape=[1],dtype=tf.float32))
 # ATTENTION BASED GRU PARAMETERS
 
 wratt = tf.get_variable("wratt", shape=[hidden_size,hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uratt = tf.get_variable("uratt", shape=[hidden_size,hidden_size],initializer=tf.orthogonal_initializer())
+uratt = tf.get_variable("uratt", shape=[hidden_size,hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 bratt = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 watt = tf.get_variable("watt", shape=[hidden_size,hidden_size],initializer=tf.contrib.layers.xavier_initializer())
-uatt = tf.get_variable("uatt", shape=[hidden_size, hidden_size],initializer=tf.orthogonal_initializer())
+uatt = tf.get_variable("uatt", shape=[hidden_size, hidden_size],initializer=tf.contrib.layers.xavier_initializer())
 batt = tf.Variable(tf.random_uniform(shape=[hidden_size],dtype=tf.float32))
 
 # MEMORY UPDATE PARAMETERS
@@ -417,8 +421,6 @@ def DMN(tf_facts,tf_questions):
     
     encoded_input = forward + backward
 
-    encoded_input = tf.nn.dropout(encoded_input,keep_prob)
-
     # Question Module
     
     question_representation = GRU(tf_questions,hidden,
@@ -453,6 +455,7 @@ def DMN(tf_facts,tf_questions):
         Z2 = tf.multiply(encoded_input,episodic_memory)
         Z3 = tf.abs(tf.subtract(encoded_input,question_representation))
         Z4 = tf.abs(tf.subtract(encoded_input,episodic_memory))
+        
         Z = tf.concat([Z1,Z2,Z3,Z4],2)
         
         Z = tf.reshape(Z,[-1,4*hidden_size])
@@ -514,7 +517,8 @@ for weight in all_weights:
 # Define loss and optimizer
 cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=model_output, labels=tf_answers)) + beta*regularizer
 
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate,beta1=0.9,beta2=0.98,epsilon=1e-9).minimize(cost)
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+#optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate,centered=True).minimize(cost)
 
 #Evaluate model
 correct_pred = tf.equal(tf.cast(tf.argmax(model_output,1),tf.int32),tf_answers)
@@ -527,7 +531,7 @@ init = tf.global_variables_initializer()
 
 # ### Training....
 
-# In[ ]:
+# In[12]:
 
 
 with tf.Session() as sess: # Start Tensorflow Session
@@ -542,11 +546,11 @@ with tf.Session() as sess: # Start Tensorflow Session
     val_acc_list=[]
     best_val_acc=0
     prev_val_acc=0
-    patience = 20
+    patience = 99
     impatience = 0
     display_step = 20
             
-    batch_size = 64
+    batch_size = 128
     
     while step <= epochs:
         
@@ -578,7 +582,7 @@ with tf.Session() as sess: # Start Tensorflow Session
         loss_list.append(avg_loss) 
         acc_list.append(avg_acc) 
 
-        val_batch_size = 20 #(should be able to divide total no. of validation samples without remainder)
+        val_batch_size = 100 #(should be able to divide total no. of validation samples without remainder)
         batches_val_fact_stories,batches_val_questions,batches_val_answers = create_batches(val_fact_stories,val_questions,val_answers,val_batch_size)
         
         for i in xrange(len(batches_val_questions)):
@@ -600,22 +604,17 @@ with tf.Session() as sess: # Start Tensorflow Session
 
         print "\nEpoch " + str(step) + ", Validation Loss= " +                 "{:.3f}".format(avg_val_loss) + ", validation Accuracy= " +                 "{:.3f}%".format(avg_val_acc*100)+""
         print "Epoch " + str(step) + ", Average Training Loss= " +               "{:.3f}".format(avg_loss) + ", Average Training Accuracy= " +               "{:.3f}%".format(avg_acc*100)+""
-                    
-        if avg_val_acc > best_val_acc: # When better accuracy is received than previous best validation accuracy
-                
-            best_val_acc = avg_val_acc # update value of best validation accuracy received yet.
-            saver.save(sess, 'Model_Backup/model.ckpt') # save_model including model variables (weights, biases etc.)
-            print "Checkpoint created!"  
+        
+        impatience += 1
             
-        if avg_val_acc > prev_val_acc:
+        if avg_val_acc >= best_val_acc: # When better accuracy is received than previous best validation accuracy
             impatience = 0
-        else:
-            impatience += 1
-            
-        prev_val_acc = avg_val_acc
+            best_val_acc = avg_val_acc # update value of best validation accuracy received yet.
+            saver.save(sess, 'DMN_Model_Backup/model.ckpt') # save_model including model variables (weights, biases etc.)
+            print "Checkpoint created!"  
         
         if impatience > patience:
-            print "Early Stopping since valudation accuracy not increasing for "+str(patience)+" epochs."
+            print "Early Stopping since best validation accuracy not increasing for "+str(patience)+" epochs."
             break
             
         print ""
@@ -626,8 +625,91 @@ with tf.Session() as sess: # Start Tensorflow Session
         
     print "\nOptimization Finished!\n"
     
-    print "Best Validation Accuracy: %.3f%%"%((best_val_acc)*100)
+    print "Best Validation Loss: %.3f%%"%((best_val_acc)*100)
     
     #The model can be run on test data set after this.
     #val_loss_list, val_acc_list, loss_list and acc_list can be used for plotting. 
     
+
+
+# In[13]:
+
+
+#Saving logs about change of training and validation loss and accuracy over epochs in another file.
+
+import h5py
+
+file = h5py.File('Training_logs_DMN_plus.h5','w')
+file.create_dataset('val_acc', data=np.array(val_acc_list))
+file.create_dataset('val_loss', data=np.array(val_loss_list))
+file.create_dataset('acc', data=np.array(acc_list))
+file.create_dataset('loss', data=np.array(loss_list))
+
+file.close()
+
+
+# In[14]:
+
+
+import h5py
+import numpy as np
+import matplotlib.pyplot as plt
+get_ipython().magic(u'matplotlib inline')
+
+log = h5py.File('Training_logs_DMN_plus.h5','r+') # Loading logs about change of training and validation loss and accuracy over epochs
+
+y1 = log['val_acc'][...]
+y2 = log['acc'][...]
+
+x = np.arange(1,len(y1)+1,1) # (1 = starting epoch, len(y1) = no. of epochs, 1 = step) 
+
+plt.plot(x,y1,'b',label='Validation Accuracy') 
+plt.plot(x,y2,'r',label='Training Accuracy')
+plt.legend(loc='lower right')
+plt.xlabel('epoch')
+plt.show()
+
+y1 = log['val_loss'][...]
+y2 = log['loss'][...]
+
+plt.plot(x,y1,'b',label='Validation Loss')
+plt.plot(x,y2,'r',label='Training Loss')
+plt.legend(loc='upper right')
+plt.xlabel('epoch')
+plt.show()
+
+
+# In[15]:
+
+
+with tf.Session() as sess: # Begin session
+    
+    print 'Loading pre-trained weights for the model...'
+    saver = tf.train.Saver()
+    saver.restore(sess, 'DMN_Model_Backup/model.ckpt')
+    sess.run(tf.global_variables())
+    print '\nRESTORATION COMPLETE\n'
+    
+    print 'Testing Model Performance...'
+    
+    total_test_loss = 0
+    total_test_acc = 0
+    
+    test_batch_size = 100 #(should be able to divide total no. of test samples without remainder)
+    batches_test_fact_stories,batches_test_questions,batches_test_answers = create_batches(test_fact_stories,test_questions,test_answers,test_batch_size)
+        
+    for i in xrange(len(batches_test_questions)):
+        test_loss, test_acc = sess.run([cost, accuracy], 
+                                        feed_dict={tf_facts: batches_test_fact_stories[i], 
+                                                   tf_questions: batches_test_questions[i], 
+                                                   tf_answers: batches_test_answers[i],
+                                                   keep_prob: 1})
+        total_test_loss += test_loss
+        total_test_acc += test_acc
+                      
+            
+    avg_test_loss = total_test_loss/len(batches_test_questions) 
+    avg_test_acc = total_test_acc/len(batches_test_questions) 
+
+
+    print "\nTest Loss= " +           "{:.3f}".format(avg_test_loss) + ", Test Accuracy= " +           "{:.3f}%".format(avg_test_acc*100)+""
