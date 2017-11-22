@@ -22,4 +22,4 @@ The published classification error of QA task 16 (basic induction) of bAbi Datas
 
 My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about 49.1% classification accuracy on Test Data for induction tasks (check DMN+.ipynb)...i.e the classification error is about 50.9. 
 
-The error is less than what the original DMN model acheived as specified in the paper, but still greater than the errors achieved achieved by the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
+The error is less than what the original DMN model acheived (error >55) as specified in the paper, but still greater than the errors achieved achieved by the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
