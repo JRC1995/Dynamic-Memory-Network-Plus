@@ -9,3 +9,5 @@ I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.e
 I trained the model for a few epochs on solely induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). 
 
 This implementation wasn't tested on test data set, since I didn't complete the training.
+
+Hyperparameters may vary from the original implementation. 
