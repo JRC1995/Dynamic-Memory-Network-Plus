@@ -20,6 +20,21 @@ I trained the model in a weakly supervised fashion. That is, the model won't be 
 
 The published classification error of QA task 16 (basic induction) of bAbi Dataset of the DMN+ model (as given here: https://arxiv.org/pdf/1603.01417.pdf - page 7) is 45.3. 
 
+Why error so high on basic induction?
+
+From the paper:
+
+>One notable deficiency in our model is that of QA16: Basic
+Induction. In Sukhbaatar et al. (2015), an untied model
+using only summation for memory updates was able to
+achieve a near perfect error rate of 0.4. When the memory
+update was replaced with a linear layer with ReLU activation,
+the end-to-end memory network’s overall mean error
+decreased but the error for QA16 rose sharply. Our model
+experiences the same difficulties, suggesting that the more
+complex memory update component may prevent convergence
+on certain simpler tasks.
+
 My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about 49.1% classification accuracy on Test Data for induction tasks (check DMN+.ipynb)...i.e the classification error is about 50.9. 
 
 
