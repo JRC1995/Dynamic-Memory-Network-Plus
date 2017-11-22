@@ -12,6 +12,9 @@ This implementation wasn't tested on test data set, since I didn't complete the 
 
 Hyperparameters may vary from the original implementation. I used orthogonal initialization on the hidden state weights. That seemed to speed up training. 
 
+Hidden size used = 100
+Embedding size used = 100
+
 I am training the model to be weakly supervised. That is the model won't be told which supporting facts are relevant for inductive reasoning in order to derive an answer. 
 
 The published classification error of QA task 16 (basic induction) of bAbi Dataset of the DMN+ model (as given here: https://arxiv.org/pdf/1603.01417.pdf) is 45.3. 
