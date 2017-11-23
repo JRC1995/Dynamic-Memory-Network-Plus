@@ -16,11 +16,18 @@ I used the 100 dimensional embeddings.
 
 I trained the model on basic induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). 
 
-Hyperparameters are different from the original implementation.
+Hyperparameters are slightly different from the original implementation.
 
-Hidden size used = 100
+## Hyperparameters used:
 
-Embedding size used = 100
+* Hidden size = 100
+* Embedding dimensions = 100
+* Learning rate = 0.001
+* Passes = 3
+* Mini Batch Size = 128
+* L2 Regularization = 0.0001
+* Dropout Rate = 0.1
+* Xaviar Initialization for weights
 
 
 I trained the model in a weakly supervised fashion. That is, the model won't be told which supporting facts are relevant for inductive reasoning in order to derive an answer. 
