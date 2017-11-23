@@ -2,11 +2,17 @@
 
 Implementation of Dynamic Memory Network + (for question answering) using Tensorflow.
 
-The implementation is based on the model proposed in ["Dynamic Memory Networks for Visual and Textual Question Answering" by Caiming Xiong, Stephen Merity, Richard Socher, arXiv:1603.01417](https://arxiv.org/abs/1603.01417). The original Dynamic Memory Network is introduced in this ["Ask Me Anything:
-Dynamic Memory Networks for Natural Language Processing" by Ankit Kumar, Peter Ondruska, Mohit Iyyer, James Bradbury, Ishaan Gulrajani, Victor Zhong,
-Romain Paulus, Richard Socher, arXiv:1506.07285](https://arxiv.org/pdf/1506.07285.pdf) (I had to refer to this paper too).
+The implementation is based on the model proposed in 
 
-This is the DMN+ model as mentioned in the paper. It uses:
+["Dynamic Memory Networks for Visual and Textual Question Answering" by Caiming Xiong, Stephen Merity, Richard Socher, arXiv:1603.01417](https://arxiv.org/abs/1603.01417). 
+
+The original Dynamic Memory Network is introduced in 
+
+["Ask Me Anything: Dynamic Memory Networks for Natural Language Processing" by Ankit Kumar, Peter Ondruska, Mohit Iyyer, James Bradbury, Ishaan Gulrajani, Victor Zhong,Romain Paulus, Richard Socher, arXiv:1506.07285](https://arxiv.org/pdf/1506.07285.pdf) 
+
+(I had to refer to this paper too).
+
+This DMN+ Model uses:
 
 * Word vectors in facts are positionally encoded, and added to create sentence representations.
 * Bi-directional GRU is used over the sentence representations in the funsion layer. The forward and backward list of hidden states are added.
