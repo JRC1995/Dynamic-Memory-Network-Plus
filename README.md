@@ -27,6 +27,7 @@ Hyperparameters are slightly different from the original implementation.
 * Mini Batch Size = 128
 * L2 Regularization = 0.0001
 * Dropout Rate = 0.1
+* Initialization = Xavier
 
 I trained the model in a weakly supervised fashion. That is, the model won't be told which supporting facts are relevant for inductive reasoning in order to derive an answer. 
 
