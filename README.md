@@ -4,6 +4,12 @@ Implementation of Dynamic Memory Network Plus (for question answering) using Ten
 
 The model is based on this [paper](https://arxiv.org/abs/1603.01417). The original Dynamic Memory Network is introduced in this [paper](https://arxiv.org/pdf/1506.07285.pdf) (I had to refer to this paper too).
 
+This is the DMN+ model as mentioned in the paper. It uses:
+
+* Word vectors in facts are positionally encoded, and added to create sentence representations.
+* Bi-directional GRU is used over the sentence representations in the funsion layer. The forward and backward list of hidden states are added.
+* 
+
 I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.edu/projects/glove/).
 I used the 100 dimensional embeddings. 
 
@@ -44,6 +50,14 @@ The error is less than what the original DMN model acheived (error 55.1) as spec
 This could be due to using different hyperparameters and embeddings, or I may have missed something in my implementations.
 
 Feel free to feedback if you find something amiss.
+
+## File Descriptiosn:
+
+**QA_PreProcess.py\QA_PreProcess.ipynb:** Converts the raw induction tasks data set to separate ndarrays containing questions, answers, and facts with all words being in the form of GloVe pre-trained vector representations.  
+
+**DMN+.py\DMN+.ipynb:** The DMN+ model where the single word answer is computed from a probability distribution which is computed by one linear layer transforming the final memory state of the episodic memory module. 
+
+**DMN+ GRU_answer.py\DMN+ GRU_answer.ipynb:** The DMN+ model where the single word answer is computedin two step. In the first step, a GRU is used for one timestep with the question representation as the input and the final memory state of the episodic memory module as the initial hidden state. In the second step, the output of the GRU is linearly transformed to a probability distribution, from which the final answer is dervied (the one with the maximum probability).
 
 ## Tested on:
 
