@@ -5,13 +5,11 @@ Implementation of Dynamic Memory Network + (for question answering) using Tensor
 The implementation is based on the model proposed in 
 
 ["Dynamic Memory Networks for Visual and Textual Question Answering" 
-
 by Caiming Xiong, Stephen Merity, Richard Socher, arXiv:1603.01417](https://arxiv.org/abs/1603.01417). 
 
 The original Dynamic Memory Network was introduced in 
 
 ["Ask Me Anything: Dynamic Memory Networks for Natural Language Processing" 
-
 by Ankit Kumar, Peter Ondruska, Mohit Iyyer, James Bradbury, Ishaan Gulrajani, Victor Zhong,Romain Paulus, Richard Socher, arXiv:1506.07285](https://arxiv.org/pdf/1506.07285.pdf) 
 
 (I had to refer to this paper too).
