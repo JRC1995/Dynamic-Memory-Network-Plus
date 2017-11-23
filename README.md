@@ -35,7 +35,7 @@ Hyperparameters are slightly different from the original implementation.
 * Learning rate = 0.001
 * Passes = 3
 * Mini Batch Size = 128
-* L2 Regularization = 0.0001
+* L2 Regularization = 0.0001 (may require more tuning)
 * Dropout Rate = 0.1
 * Initialization = Xavier
 
