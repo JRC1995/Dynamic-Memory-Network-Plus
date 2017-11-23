@@ -29,6 +29,8 @@ Hyperparameters are slightly different from the original implementation.
 * Dropout Rate = 0.1
 * Initialization = Xavier
 
+(last 10% of data samples used for validation.)
+
 ## Result Discussion: 
 
 I trained the model in a weakly supervised fashion. That is, the model won't be told which supporting facts are relevant for inductive reasoning in order to derive an answer. 
