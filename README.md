@@ -8,7 +8,8 @@ This is the DMN+ model as mentioned in the paper. It uses:
 
 * Word vectors in facts are positionally encoded, and added to create sentence representations.
 * Bi-directional GRU is used over the sentence representations in the funsion layer. The forward and backward list of hidden states are added.
-* 
+* Attention Based GRU is used in the episodic memory module.
+* A linear layer with ReLu activation is used along with untied weights to update the memory for the next pass. 
 
 I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.edu/projects/glove/).
 I used the 100 dimensional embeddings. 
