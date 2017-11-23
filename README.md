@@ -1,6 +1,6 @@
-# Implementation of Dynamic Memory Network Plus
+# Implementation of Dynamic Memory Network + 
 
-Implementation of Dynamic Memory Network Plus (for question answering) using Tensorflow.
+Implementation of Dynamic Memory Network + (for question answering) using Tensorflow.
 
 The model is based on this [paper](https://arxiv.org/abs/1603.01417). The original Dynamic Memory Network is introduced in this [paper](https://arxiv.org/pdf/1506.07285.pdf) (I had to refer to this paper too).
 
@@ -28,6 +28,8 @@ Hyperparameters are slightly different from the original implementation.
 * L2 Regularization = 0.0001
 * Dropout Rate = 0.1
 * Initialization = Xavier
+
+## Result Discussion: 
 
 I trained the model in a weakly supervised fashion. That is, the model won't be told which supporting facts are relevant for inductive reasoning in order to derive an answer. 
 
