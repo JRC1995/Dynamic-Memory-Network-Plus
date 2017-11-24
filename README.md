@@ -37,7 +37,7 @@ Hyperparameters are slightly different from the original implementation.
 * Mini Batch Size = 128
 * L2 Regularization = 0.005
 * Dropout Rate = 0.1
-* Initialization = Xavier
+* Initialization = 0 for biases, Orthogonal (for hidden state weights), Xavier for everything else.
 
 (last 10% of data samples used for validation.)
 
@@ -72,7 +72,7 @@ This could be due to using different hyperparameters and embeddings, or I may ha
 
 Feel free to feedback if you find something amiss.
 
-## File Descriptiosn:
+## File Descriptions:
 
 **QA_PreProcess.py\QA_PreProcess.ipynb:** Converts the raw induction tasks data set to separate ndarrays containing questions, answers, and facts with all words being in the form of GloVe pre-trained vector representations.  
 
