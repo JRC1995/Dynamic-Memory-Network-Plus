@@ -82,17 +82,16 @@ question = []
 answer = []   
 
     
-#max_fact_len = 6
-#max_question_len = 5
+max_fact_len = 0
+max_question_len = 0
 
 
-def extract_info(filename):  
+def extract_info(filename,max_fact_len,max_question_len):  
         
     fact_story = [] 
     fact_stories = []
     questions = []
     answers = []
-    #PAD = word2vec('<PAD>')
 
     file = open(filename,'r')
     for line in file.readlines(): 
@@ -112,6 +111,8 @@ def extract_info(filename):
             q = q[1:]
             q = map(word2vec,q)
             questions.append(q)
+            if len(q)>max_question_len:
+                max_question_len = len(q)
             answers.append(map(vocab.index,a))
             
         else: 
@@ -119,9 +120,9 @@ def extract_info(filename):
             fact = line.strip().split(' ') 
             fact = fact[1:]
             fact = map(word2vec,fact)
-            #for i in xrange(len(fact),max_fact_len):
-                #fact.append(PAD)
             fact_story.append(fact)
+            if len(fact)>max_fact_len:
+                max_fact_len=len(fact)
 
         if flag_end_story == 1: 
             fact_stories.append(fact_story)  
@@ -129,20 +130,36 @@ def extract_info(filename):
             
     file.close()
         
-    return fact_stories,questions,answers
+    return fact_stories,questions,answers,max_fact_len,max_question_len
 
-fact_stories,questions,answers = extract_info(filename)
+fact_stories,questions,answers,max_fact_len,max_question_len = extract_info(filename,max_fact_len,max_question_len)
 
 filename = 'qa16_basic-induction_test.txt' 
 
-test_fact_stories,test_questions,test_answers = extract_info(filename)
+test_fact_stories,test_questions,test_answers,max_fact_len,max_question_len = extract_info(filename,max_fact_len,max_question_len)
+
+
+# In[4]:
+
+
+print max_fact_len
+print max_question_len
 
 
 # In[5]:
 
 
-max_fact_len = 6
-max_question_len = 5
+print map(vec2word,fact_stories[0][0])
+
+
+# In[6]:
+
+
+print map(vec2word,test_fact_stories[0][0])
+
+
+# In[7]:
+
 
 PAD = word2vec('<PAD>')
 
@@ -157,7 +174,13 @@ for i in xrange(0,len(questions)):
  
 
 
-# In[6]:
+# In[13]:
+
+
+print map(vec2word,fact_stories[0][2])
+
+
+# In[9]:
 
 
 for i in xrange(0,len(test_questions)):
@@ -170,7 +193,13 @@ for i in xrange(0,len(test_questions)):
             test_fact_stories[i][j].append(PAD)
 
 
-# In[7]:
+# In[15]:
+
+
+print map(vec2word,test_fact_stories[0][3])
+
+
+# In[11]:
 
 
 fact_stories = np.asarray(fact_stories,np.float32)
@@ -187,7 +216,7 @@ test_answers = np.asarray(test_answers,np.float32)
 print test_answers.shape
 
 
-# In[8]:
+# In[12]:
 
 
 #Saving processed data in another file.
@@ -198,4 +227,3 @@ PICK = [fact_stories,questions,answers,test_fact_stories,test_questions,test_ans
 
 with open('embeddingPICKLE', 'wb') as fp:
     pickle.dump(PICK, fp)
-
