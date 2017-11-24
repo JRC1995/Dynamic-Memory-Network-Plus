@@ -45,6 +45,8 @@ Hyperparameters are slightly different from the original implementation.
 
 I trained the model in a weakly supervised fashion. That is, the model won't be told which supporting facts are relevant for inductive reasoning in order to derive an answer. 
 
+The network seems to be starting to overfit around the 30th epoch. The validation cost starts to increase, while the traaining cost keeps on decreasing. 
+
 The published classification error of QA task 16 (basic induction) of bAbi Dataset of the DMN+ model (as given here: https://arxiv.org/pdf/1603.01417.pdf - page 7) is 45.3. 
 
 Why error so high on basic induction?
