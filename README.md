@@ -35,7 +35,7 @@ Hyperparameters are slightly different from the original implementation.
 * Learning rate = 0.001
 * Passes = 3
 * Mini Batch Size = 128
-* L2 Regularization = 0.0001 (may require more tuning)
+* L2 Regularization = 0.005
 * Dropout Rate = 0.1
 * Initialization = Xavier
 
@@ -62,7 +62,7 @@ experiences the same difficulties, suggesting that the more
 complex memory update component may prevent convergence
 on certain simpler tasks.
 
-My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about 49.1% classification accuracy on Test Data for induction tasks (check DMN+.ipynb)...i.e the classification error is about 50.9. 
+My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about 50.4% classification accuracy on Test Data for induction tasks (check DMN+.ipynb)...i.e the classification error is about 49.6. 
 
 
 The error is less than what the original DMN model acheived (error 55.1) as specified in the paper, but still greater than the errors achieved achieved by the original implementation of the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
@@ -76,9 +76,7 @@ Feel free to feedback if you find something amiss.
 
 **QA_PreProcess.py\QA_PreProcess.ipynb:** Converts the raw induction tasks data set to separate ndarrays containing questions, answers, and facts with all words being in the form of GloVe pre-trained vector representations.  
 
-**DMN+.py\DMN+.ipynb:** The DMN+ model where the single word answer is computed from a probability distribution which is computed by one linear layer transforming the final memory state of the episodic memory module. 
-
-**DMN+ GRU_answer.py\DMN+ GRU_answer.ipynb:** The DMN+ model where the single word answer is computedin two step. In the first step, a GRU is used for one timestep with the question representation as the input and the final memory state of the episodic memory module as the initial hidden state. In the second step, the output of the GRU is linearly transformed to a probability distribution, from which the final answer is dervied (the one with the maximum probability).
+**DMN+.py\DMN+.ipynb:** The DMN+ model, along with training, validation and testing. 
 
 ## Tested on:
 
