@@ -445,7 +445,7 @@ bt = tf.get_variable("bt", shape=[passes,hidden_size],initializer=tf.constant_in
 
 # Answer module
 
-# GRU PARAMETERS FOR QUESTION MODULE (TO ENCODE THE QUESTIONS)
+# GRU PARAMETERS FOR ANSWER MODULE
 
 wza = tf.get_variable("wza", shape=[hidden_size, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
@@ -471,13 +471,14 @@ ua = tf.get_variable("ua", shape=[hidden_size, hidden_size],
                      regularizer=regularizer)
 ba = tf.get_variable("ba", shape=[hidden_size],initializer=init)
 
+# Parameter to convert output as of now to a probability distribution. 
     
 wa1 = tf.get_variable("wa1", shape=[hidden_size,len(vocab)],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)    
 
 
-# ### Dynamic Memory Network + Model Definition
+# ### Dynamic Memory Network+ Model Definition
 
 # In[12]:
 
