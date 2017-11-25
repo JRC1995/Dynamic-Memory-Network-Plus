@@ -26,6 +26,8 @@ I used the 100 dimensional embeddings.
 
 I trained the model on basic induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). 
 
+After computing the final episodic memory, I used a GRU for a single timestep, and linearly transformed the final hidden step to result in the probability distribution of the single word answer. 
+
 Hyperparameters are slightly different from the original implementation.
 
 ## Hyperparameters used:
