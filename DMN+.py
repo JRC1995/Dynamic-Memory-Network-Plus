@@ -198,7 +198,7 @@ def create_batches(fact_stories,questions,answers,batch_size):
             
         batch_fact_stories = np.asarray(batch_fact_stories,np.float32)
         batch_fact_stories = np.transpose(batch_fact_stories,[1,0,2])
-        #result = number of facts x batch_size x fact sentence size x word vector size
+        #result = number of facts x batch_size x word vector size
         
         batch_questions = np.asarray(batch_questions,np.float32)
         batch_questions = np.transpose(batch_questions,[1,0,2])
