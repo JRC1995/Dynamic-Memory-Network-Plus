@@ -67,15 +67,12 @@ experiences the same difficulties, suggesting that the more
 complex memory update component may prevent convergence
 on certain simpler tasks.
 
-My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **51.1% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 48.9**. 
+My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **51.1% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 48.9**. From my trainings, 51.1% is the best accuracy I have found in my model, but the accuracy can go down to 48% depending on the initializations. 
 
 
 The error is less than what the original DMN model acheived (error 55.1) as specified in the paper, but still greater than the errors achieved achieved by the original implementation of the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
 
-
 This could be due to using different hyperparameters and embeddings, or I may have missed something in my implementations.
-
-Feel free to feedback if you find something amiss.
 
 ## File Descriptions:
 
