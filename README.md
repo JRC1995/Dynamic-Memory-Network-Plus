@@ -1,3 +1,5 @@
+# UNDER CONSTRUCTION
+
 # Implementation of Dynamic Memory Network+   
 
 Implementation of Dynamic Memory Network+ (for question answering) using Tensorflow.
