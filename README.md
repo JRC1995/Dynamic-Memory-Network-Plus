@@ -1,5 +1,3 @@
-# UNDER CONSTRUCTION
-
 # Implementation of Dynamic Memory Network+   
 
 Implementation of Dynamic Memory Network+ (for question answering) using Tensorflow.
@@ -64,7 +62,7 @@ experiences the same difficulties, suggesting that the more
 complex memory update component may prevent convergence
 on certain simpler tasks.
 
-My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **49% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 51**. . 
+My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **50.7% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 49.3**. . 
 
 The error is less than what the original DMN model acheived (error 55.1) as specified in the paper, but still greater than the errors achieved achieved by the original implementation of the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
 
