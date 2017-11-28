@@ -26,9 +26,6 @@ I used the 100 dimensional embeddings.
 
 I trained the model on basic induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). 
 
-After computing the final episodic memory, I used a GRU for a single timestep (with the question embedding as the input token, and the final epsidoic memory as the initial hidden state), and then I linearly transformed the final hidden step to result in the probability distribution of the single word answer. Instead, using one linear layer would have been fine too. 
-For the linear transformation to probability distribution, I used the GloVe embedding matrix (I didn't use it as a trainable parameter). It seemed to speed up the increment of validation and training accuracy, initially. 
-
 Hyperparameters are slightly different from the original implementation.
 
 ## Hyperparameters used:
@@ -38,9 +35,9 @@ Hyperparameters are slightly different from the original implementation.
 * Learning rate = 0.001
 * Passes = 3
 * Mini Batch Size = 128
-* L2 Regularization = 0.0001
+* L2 Regularization = 0.00005
 * Dropout Rate = 0.1
-* Initialization = 0 for biases, Orthogonal (for hidden state weights of RNNs), Xavier for everything else.
+* Initialization = 0 for biases, Xavier for weights
 
 (last 10% of data samples used for validation.)
 
@@ -51,8 +48,6 @@ I trained the model in a weakly supervised fashion. That is, the model won't be 
 The network starts to overfit around the 35th epoch. The validation cost starts to increase, while the training cost keeps on decreasing. 
 
 The published classification error of QA task 16 (basic induction) of bAbi Dataset of the DMN+ model (as given here: https://arxiv.org/pdf/1603.01417.pdf - page 7) is 45.3. 
-
-Why error so high on basic induction?
 
 From the paper:
 
@@ -67,8 +62,7 @@ experiences the same difficulties, suggesting that the more
 complex memory update component may prevent convergence
 on certain simpler tasks.
 
-My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **51.1% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 48.9**. From my trainings, 51.1% is the best accuracy I have found in my model, but the accuracy can go down to 48% depending on the initializations. 
-
+My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **49% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 51**. . 
 
 The error is less than what the original DMN model acheived (error 55.1) as specified in the paper, but still greater than the errors achieved achieved by the original implementation of the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
 
@@ -84,4 +78,4 @@ This could be due to using different hyperparameters and embeddings, or I may ha
 
 * Tensorflow 1.3.1
 * Numpy 1.13.3
-* Pything 2.7.1
+* Python 2.7.12
