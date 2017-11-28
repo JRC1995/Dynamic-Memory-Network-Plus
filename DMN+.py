@@ -70,30 +70,30 @@ test_fact_stories = processed_data[3]
 test_questions = processed_data[4]
 test_answers = np.reshape(processed_data[5],(len(processed_data[5])))
 
-print fact_stories.shape
-print questions.shape
-print answers.shape
-print test_fact_stories.shape
-print test_questions.shape
-print test_answers.shape
-    
-
 
 # In[2]:
 
 
-print map(vec2word,fact_stories[0][0])
+import random
 
+print "EXAMPLE DATA:\n"
 
-# In[3]:
+sample = random.randint(0,len(fact_stories))
 
-
-print map(vec2word,questions[0])
+print "FACTS:\n"
+for i in xrange(len(fact_stories[sample])):
+    print str(i+1)+") ",
+    print map(vec2word,fact_stories[sample][i])
+    
+print "\nQUESTION:"
+print map(vec2word,questions[sample])
+print "\nANSWER:"
+print vocab[answers[sample]]
 
 
 # ### CREATING TRAINING AND VALIDATION DATA
 
-# In[4]:
+# In[3]:
 
 
 from __future__ import division
@@ -126,7 +126,7 @@ val_answers = answers[train_len:(train_len+val_len)]
 # 
 # "sentence embedding"
 
-# In[5]:
+# In[4]:
 
 
 def sentence_reader(fact_stories): #positional_encoder
@@ -145,13 +145,12 @@ def sentence_reader(fact_stories): #positional_encoder
                 for dimension in xrange(0,word_vec_dim):
                     
                     j = word_position + 1 # making position start from 1 instead of 0
-                    d = dimension + 1 # making dimensions start from 1 isntead of 0 (1-50 instead of 0-49)
+                    d = dimension + 1 # making dimensions start from 1 isntead of 0 (1-100 instead of 0-99)
                     
                     l[dimension] = (1-(j/M)) - (d/word_vec_dim)*(1-2*(j/M))
                 
-                fact_stories[fact_story_index,fact_index,word_position] = np.multiply(l,fact_stories[fact_story_index,fact_index,word_position])
+                pe_fact_stories[fact_story_index,fact_index] += np.multiply(l,fact_stories[fact_story_index,fact_index,word_position])
 
-            pe_fact_stories[fact_story_index,fact_index] = np.sum(fact_stories[fact_story_index,fact_index],0)
 
     return pe_fact_stories
 
@@ -162,17 +161,9 @@ test_fact_stories = sentence_reader(test_fact_stories)
         
 
 
-# In[6]:
-
-
-print train_fact_stories.shape
-print val_fact_stories.shape
-print test_fact_stories.shape
-
-
 # ### Function to create randomized batches
 
-# In[7]:
+# In[5]:
 
 
 def create_batches(fact_stories,questions,answers,batch_size):
@@ -198,11 +189,11 @@ def create_batches(fact_stories,questions,answers,batch_size):
             
         batch_fact_stories = np.asarray(batch_fact_stories,np.float32)
         batch_fact_stories = np.transpose(batch_fact_stories,[1,0,2])
-        #result = number of facts x batch_size x sentence vector size
+        #result = number of facts x batch_size x fact sentence size x word vector size
         
         batch_questions = np.asarray(batch_questions,np.float32)
         batch_questions = np.transpose(batch_questions,[1,0,2])
-        #result = question_length x batch_size x word vector size
+        #result = question_length x batch_size x fact sentence size x word vector size
         
         batches_fact_stories.append(batch_fact_stories)
         batches_questions.append(batch_questions)
@@ -220,7 +211,7 @@ def create_batches(fact_stories,questions,answers,batch_size):
 
 # ### Hyperparameters
 
-# In[8]:
+# In[6]:
 
 
 import tensorflow as tf
@@ -233,50 +224,47 @@ tf_answers = tf.placeholder(tf.int32,[None])
 keep_prob = tf.placeholder(tf.float32)
 
 #hyperparameters
-epochs = 256
+epochs = 100
 learning_rate = 0.001
 hidden_size = 100
 passes = 3
-beta = 0.0001 #l2 regularization scale
+beta = 0.0005 #l2 regularization scale
 
 
 # ### All the trainable parameters initialized here
 
-# In[9]:
-
+# In[7]:
 
 
 # Parameters
 
 # FORWARD GRU PARAMETERS FOR INPUT MODULE
 
-value = np.zeros((hidden_size),np.float32)
-init = tf.constant_initializer(value)
 regularizer = tf.contrib.layers.l2_regularizer(scale=beta)
 
 wzf = tf.get_variable("wzf", shape=[word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer= regularizer)
 uzf = tf.get_variable("uzf", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-bzf = tf.get_variable("bzf", shape=[hidden_size],initializer=init)
+bzf = tf.get_variable("bzf", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 wrf = tf.get_variable("wrf", shape=[word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
 urf = tf.get_variable("urf", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-brf = tf.get_variable("brf", shape=[hidden_size],initializer=init)
+brf = tf.get_variable("brf", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 wf = tf.get_variable("wf", shape=[word_vec_dim, hidden_size],
                      initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
 uf = tf.get_variable("uf", shape=[hidden_size, hidden_size],
-                     initializer=tf.orthogonal_initializer(),
+                     initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
-bf = tf.get_variable("bf", shape=[hidden_size],initializer=init)
+bf = tf.get_variable("bf", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 # BACKWARD GRU PARAMETERS FOR INPUT MODULE
 
@@ -284,25 +272,26 @@ wzb = tf.get_variable("wzb", shape=[word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
 uzb = tf.get_variable("uzb", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-bzb = tf.get_variable("bzb", shape=[hidden_size],initializer=init)
+bzb = tf.get_variable("bzb", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 wrb = tf.get_variable("wrb", shape=[word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
 urb = tf.get_variable("urb", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-brb = tf.get_variable("brb", shape=[hidden_size],initializer=init)
+brb = tf.get_variable("brb", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 wb = tf.get_variable("wb", shape=[word_vec_dim, hidden_size],
                      initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
 ub = tf.get_variable("ub", shape=[hidden_size, hidden_size],
-                     initializer=tf.orthogonal_initializer(),
+                     initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
-bb = tf.get_variable("bb", shape=[hidden_size],initializer=init)
+bb = tf.get_variable("bb", shape=[hidden_size],initializer=tf.zeros_initializer())
+
 
 # GRU PARAMETERS FOR QUESTION MODULE (TO ENCODE THE QUESTIONS)
 
@@ -310,39 +299,40 @@ wzq = tf.get_variable("wzq", shape=[word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
 uzq = tf.get_variable("uzq", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-bzq = tf.get_variable("bzq", shape=[hidden_size],initializer=init)
+bzq = tf.get_variable("bzq", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 wrq = tf.get_variable("wrq", shape=[word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
 urq = tf.get_variable("urq", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-brq = tf.get_variable("brq", shape=[hidden_size],initializer=init)
+brq = tf.get_variable("brq", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 wq = tf.get_variable("wq", shape=[word_vec_dim, hidden_size],
                      initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
 uq = tf.get_variable("uq", shape=[hidden_size, hidden_size],
-                     initializer=tf.orthogonal_initializer(),
+                     initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
-bq = tf.get_variable("bq", shape=[hidden_size],initializer=init)
+bq = tf.get_variable("bq", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 
 # EPISODIC MEMORY
 
 inter_neurons = 1024
+
 w1 = tf.get_variable("w1", shape=[hidden_size*4, inter_neurons],
                      initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
 b1 = tf.get_variable("b1", shape=[inter_neurons],
-                     initializer=tf.constant_initializer(np.zeros((inter_neurons,),np.float32)))
+                     initializer=tf.zeros_initializer())
 w2 = tf.get_variable("w2", shape=[inter_neurons,1],
                      initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
-b2 = tf.get_variable("b2", shape=[1],initializer=tf.constant_initializer(0))
+b2 = tf.get_variable("b2", shape=[1],initializer=tf.zeros_initializer())
 
 # ATTENTION BASED GRU PARAMETERS
 
@@ -350,65 +340,48 @@ wratt = tf.get_variable("wratt", shape=[hidden_size,hidden_size],
                         initializer=tf.contrib.layers.xavier_initializer(),
                         regularizer=regularizer)
 uratt = tf.get_variable("uratt", shape=[hidden_size,hidden_size],
-                        initializer=tf.orthogonal_initializer(),
+                        initializer=tf.contrib.layers.xavier_initializer(),
                         regularizer=regularizer)
-bratt = tf.get_variable("bratt", shape=[hidden_size],initializer=init)
+bratt = tf.get_variable("bratt", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 watt = tf.get_variable("watt", shape=[hidden_size,hidden_size],
                        initializer=tf.contrib.layers.xavier_initializer(),
                        regularizer=regularizer)
 uatt = tf.get_variable("uatt", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
+                      initializer=tf.contrib.layers.xavier_initializer(),
                        regularizer=regularizer)
-batt = tf.get_variable("batt", shape=[hidden_size],initializer=init)
+batt = tf.get_variable("batt", shape=[hidden_size],initializer=tf.zeros_initializer())
+
 
 # MEMORY UPDATE PARAMETERS
 # (UNTIED)
+wt = []
+bt = []
 
-wt = tf.get_variable("wt", shape=[passes,hidden_size*3,hidden_size],
+for i in xrange(passes):
+    wt.append(tf.get_variable("wt"+str(i), shape=[hidden_size*3,hidden_size],
                     initializer=tf.contrib.layers.xavier_initializer(),
-                    regularizer=regularizer)
-bt = tf.get_variable("bt", shape=[passes,hidden_size],
-                     initializer=tf.constant_initializer(np.zeros((passes,hidden_size),np.float32)))
+                    regularizer=regularizer))
+    bt.append(tf.get_variable("bt"+str(i), shape=[hidden_size],
+                     initializer=tf.zeros_initializer()))
 
 
 # ANSWER MODULE PARAMETERS
 
 # GRU PARAMETERS FOR ANSWER MODULE
 
-wza = tf.get_variable("wza", shape=[hidden_size, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-uza = tf.get_variable("uza", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
-                      regularizer=regularizer)
-bza = tf.get_variable("bza", shape=[hidden_size],initializer=init)
-
-wra = tf.get_variable("wra", shape=[hidden_size, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-ura = tf.get_variable("ura", shape=[hidden_size, hidden_size],
-                      initializer=tf.orthogonal_initializer(),
-                      regularizer=regularizer)
-bra = tf.get_variable("bra", shape=[hidden_size],initializer=init)
-
-wa = tf.get_variable("wa", shape=[hidden_size, hidden_size],
+wa_pd = tf.get_variable("wa_pd", shape=[hidden_size*2,len(vocab)],
                      initializer=tf.contrib.layers.xavier_initializer(),
                      regularizer=regularizer)
-ua = tf.get_variable("ua", shape=[hidden_size, hidden_size],
-                     initializer=tf.orthogonal_initializer(),
-                     regularizer=regularizer)
-ba = tf.get_variable("ba", shape=[hidden_size],initializer=init)
-
-tf_embd = tf.convert_to_tensor(embedding)
-tf_embd = tf.transpose(tf_embd)
+ba_pd = tf.get_variable("ba_pd", shape=[len(vocab)],
+                     initializer=tf.zeros_initializer())
 
 
 # ### Low level api implementation of GRU
 # 
 # Returns a tensor of all the hidden states
 
-# In[10]:
+# In[8]:
 
 
 def GRU(inp,hidden,
@@ -448,7 +421,7 @@ def GRU(inp,hidden,
 # 
 # Returns only the final hidden state.
 
-# In[11]:
+# In[9]:
 
 
 def attention_based_GRU(inp,hidden,
@@ -480,7 +453,7 @@ def attention_based_GRU(inp,hidden,
 
 # ### Dynamic Memory Network + Model Definition
 
-# In[12]:
+# In[10]:
 
 
 def DMN_plus(tf_facts,tf_questions):
@@ -510,6 +483,8 @@ def DMN_plus(tf_facts,tf_questions):
                    wf,uf,bf,
                    facts_num)
     
+    backward = tf.reverse(backward,[0])
+    
     encoded_input = forward + backward
 
     # Question Module
@@ -527,7 +502,6 @@ def DMN_plus(tf_facts,tf_questions):
     #^we will only use the final hidden state. 
 
     question_representation = tf.reshape(question_representation,[tf_batch_size,1,hidden_size])
-    
     
     # Episodic Memory Module
     
@@ -548,7 +522,7 @@ def DMN_plus(tf_facts,tf_questions):
         Z = tf.concat([Z1,Z2,Z3,Z4],2)
         
         Z = tf.reshape(Z,[-1,4*hidden_size])
-        Z = tf.add( tf.matmul( tf.tanh( tf.add( tf.matmul(Z,w1),b1 ) ),w2 ) , b2)
+        Z = tf.matmul( tf.tanh( tf.matmul(Z,w1) + b1 ),w2 ) + b2
         Z = tf.reshape(Z,[tf_batch_size,facts_num])
         
         g = tf.nn.softmax(Z)
@@ -570,6 +544,7 @@ def DMN_plus(tf_facts,tf_questions):
         concated = tf.reshape(concated,[-1,3*hidden_size])
         
         episodic_memory = tf.nn.relu(tf.matmul(concated,wt[i]) + bt[i])
+        
         episodic_memory = tf.reshape(episodic_memory,[tf_batch_size,1,hidden_size])
 
     # Answer module 
@@ -579,25 +554,20 @@ def DMN_plus(tf_facts,tf_questions):
     episodic_memory = tf.reshape(episodic_memory,[tf_batch_size,hidden_size])
     episodic_memory = tf.nn.dropout(episodic_memory,keep_prob)
 
-    question_representation = tf.transpose(question_representation,[1,0,2])
+    question_representation = tf.reshape(question_representation,[tf_batch_size,hidden_size])
     question_representation = tf.nn.dropout(question_representation,keep_prob)
     
-    y_state = GRU(question_representation,episodic_memory,
-                  wza,uza,bza,
-                  wra,ura,bra,
-                  wa,ua,ba,1)
+    y_concat = tf.concat([question_representation,episodic_memory],1)
     
-    y_state = y_state[0]
-    y_state = tf.reshape(y_state,[tf_batch_size,hidden_size])
-    
-    y = tf.matmul(y_state,tf_embd)
+    # Convert to probability distribution
+    y = tf.matmul(y_concat,wa_pd) + ba_pd
     
     return y
 
 
 # ### Cost function, Evaluation, Optimization function 
 
-# In[13]:
+# In[11]:
 
 
 model_output = DMN_plus(tf_facts,tf_questions)
@@ -612,9 +582,9 @@ regularization = tf.contrib.layers.apply_regularization(regularizer, reg_variabl
 cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=model_output, labels=tf_answers))+regularization
 
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-#optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate,centered=True).minimize(cost)
 
 model_output = tf.nn.softmax(model_output)
+
 #Evaluate model
 correct_pred = tf.equal(tf.cast(tf.argmax(model_output,1),tf.int32),tf_answers)
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
@@ -626,20 +596,20 @@ init = tf.global_variables_initializer()
 
 # ### Training....
 
-# In[14]:
+# In[12]:
 
 
 with tf.Session() as sess: # Start Tensorflow Session
     
     saver = tf.train.Saver() 
-    # Prepares variable for saving the model
+
     sess.run(init) #initialize all variables
     step = 1   
     loss_list=[]
     acc_list=[]
     val_loss_list=[]
     val_acc_list=[]
-    best_val_loss=2**30
+    best_val_acc=0
     prev_val_acc=0
     patience = 20
     impatience = 0
@@ -702,14 +672,14 @@ with tf.Session() as sess: # Start Tensorflow Session
         
         impatience += 1
             
-        if avg_val_loss <= best_val_loss: # When better accuracy is received than previous best validation accuracy
+        if avg_val_acc >= best_val_acc: 
             impatience = 0
-            best_val_loss = avg_val_loss # update value of best validation accuracy received yet.
-            saver.save(sess, 'DMN_Model_Backup/model.ckpt') # save_model including model variables (weights, biases etc.)
+            best_val_acc = avg_val_acc
+            saver.save(sess, 'DMN_Model_Backup/model.ckpt') 
             print "Checkpoint created!"  
         
         if impatience > patience:
-            print "\nEarly Stopping since best validation loss not decreasing for "+str(patience)+" epochs."
+            print "\nEarly Stopping since best validation accuracy not increasing for "+str(patience)+" epochs."
             break
             
         print ""
@@ -720,14 +690,11 @@ with tf.Session() as sess: # Start Tensorflow Session
         
     print "\nOptimization Finished!\n"
     
-    print "Best Validation Loss: %.3f%%"%((best_val_loss))
-    
-    #The model can be run on test data set after this.
-    #val_loss_list, val_acc_list, loss_list and acc_list can be used for plotting. 
+    print "Best Validation Accuracy: %.3f%%"%((best_val_acc*100))
     
 
 
-# In[15]:
+# In[13]:
 
 
 #Saving logs about change of training and validation loss and accuracy over epochs in another file.
@@ -743,7 +710,7 @@ file.create_dataset('loss', data=np.array(loss_list))
 file.close()
 
 
-# In[16]:
+# In[14]:
 
 
 import h5py
@@ -774,7 +741,7 @@ plt.xlabel('epoch')
 plt.show()
 
 
-# In[17]:
+# In[15]:
 
 
 with tf.Session() as sess: # Begin session
