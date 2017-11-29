@@ -531,7 +531,7 @@ def DMN_plus(tf_facts,tf_questions):
         g = tf.reshape(g,[facts_num,tf_batch_size,1])
         
         context_vector = attention_based_GRU(tf.transpose(encoded_input,[1,0,2]),
-                                             tf.reshape(episodic_memory,[tf_batch_size,hidden_size]),
+                                             hidden,
                                              wratt,uratt,bratt,
                                              watt,uatt,batt,
                                              g,facts_num)
