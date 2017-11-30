@@ -108,16 +108,16 @@ val_answers = []
 p=90 #(90% data used for training. Rest for validation)
     
 train_len = int((p/100)*len(fact_stories))
-val_len = int(((100-p)/100)*len(fact_stories))
 
 train_fact_stories = fact_stories[0:train_len] 
-val_fact_stories = fact_stories[train_len:(train_len+val_len)]
+val_fact_stories = fact_stories[train_len:]
 
 train_questions = questions[0:train_len] 
-val_questions = questions[train_len:(train_len+val_len)] 
+val_questions = questions[train_len:] 
 
 train_answers = answers[0:train_len] 
-val_answers = answers[train_len:(train_len+val_len)] 
+val_answers = answers[train_len:] 
+
 
 
 # ### SENTENCE READING LAYER IMPLEMENTED BEFOREHAND 
@@ -203,7 +203,7 @@ def create_batches(fact_stories,questions,answers,batch_size):
         
     batches_fact_stories = np.asarray(batches_fact_stories,np.float32)
     batches_questions = np.asarray(batches_questions,np.float32)
-    batches_answers = np.asarray(batches_answers,np.float32)
+    batches_answers = np.asarray(batches_answers,np.int32)
     
     return batches_fact_stories,batches_questions,batches_answers
     
@@ -221,14 +221,17 @@ import tensorflow as tf
 tf_facts = tf.placeholder(tf.float32, [None,None,word_vec_dim])
 tf_questions = tf.placeholder(tf.float32, [None,None,word_vec_dim])
 tf_answers = tf.placeholder(tf.int32,[None])
-keep_prob = tf.placeholder(tf.float32)
+training = tf.placeholder(tf.bool)
 
 #hyperparameters
-epochs = 100
+epochs = 20
 learning_rate = 0.001
 hidden_size = 100
 passes = 3
-beta = 0.0005 #l2 regularization scale
+dropout_rate = 0.1
+beta = 0.001 #l2 regularization scale
+
+regularizer = tf.contrib.layers.l2_regularizer(scale=beta) #l2
 
 
 # ### All the trainable parameters initialized here
@@ -240,87 +243,39 @@ beta = 0.0005 #l2 regularization scale
 
 # FORWARD GRU PARAMETERS FOR INPUT MODULE
 
-regularizer = tf.contrib.layers.l2_regularizer(scale=beta)
-
-wzf = tf.get_variable("wzf", shape=[word_vec_dim, hidden_size],
+wf = tf.get_variable("wf", shape=[3,word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer= regularizer)
-uzf = tf.get_variable("uzf", shape=[hidden_size, hidden_size],
+uf = tf.get_variable("uf", shape=[3,hidden_size, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-bzf = tf.get_variable("bzf", shape=[hidden_size],initializer=tf.zeros_initializer())
+bf = tf.get_variable("bf", shape=[3,hidden_size],initializer=tf.zeros_initializer())
 
-wrf = tf.get_variable("wrf", shape=[word_vec_dim, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-urf = tf.get_variable("urf", shape=[hidden_size, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-brf = tf.get_variable("brf", shape=[hidden_size],initializer=tf.zeros_initializer())
-
-wf = tf.get_variable("wf", shape=[word_vec_dim, hidden_size],
-                     initializer=tf.contrib.layers.xavier_initializer(),
-                     regularizer=regularizer)
-uf = tf.get_variable("uf", shape=[hidden_size, hidden_size],
-                     initializer=tf.contrib.layers.xavier_initializer(),
-                     regularizer=regularizer)
-bf = tf.get_variable("bf", shape=[hidden_size],initializer=tf.zeros_initializer())
 
 # BACKWARD GRU PARAMETERS FOR INPUT MODULE
 
-wzb = tf.get_variable("wzb", shape=[word_vec_dim, hidden_size],
+wb = tf.get_variable("wb", shape=[3,word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-uzb = tf.get_variable("uzb", shape=[hidden_size, hidden_size],
+ub = tf.get_variable("ub", shape=[3,hidden_size, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-bzb = tf.get_variable("bzb", shape=[hidden_size],initializer=tf.zeros_initializer())
-
-wrb = tf.get_variable("wrb", shape=[word_vec_dim, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-urb = tf.get_variable("urb", shape=[hidden_size, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-brb = tf.get_variable("brb", shape=[hidden_size],initializer=tf.zeros_initializer())
-
-wb = tf.get_variable("wb", shape=[word_vec_dim, hidden_size],
-                     initializer=tf.contrib.layers.xavier_initializer(),
-                     regularizer=regularizer)
-ub = tf.get_variable("ub", shape=[hidden_size, hidden_size],
-                     initializer=tf.contrib.layers.xavier_initializer(),
-                     regularizer=regularizer)
-bb = tf.get_variable("bb", shape=[hidden_size],initializer=tf.zeros_initializer())
-
+bb = tf.get_variable("bb", shape=[3,hidden_size],initializer=tf.zeros_initializer())
 
 # GRU PARAMETERS FOR QUESTION MODULE (TO ENCODE THE QUESTIONS)
 
-wzq = tf.get_variable("wzq", shape=[word_vec_dim, hidden_size],
+wq = tf.get_variable("wq", shape=[3,word_vec_dim, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-uzq = tf.get_variable("uzq", shape=[hidden_size, hidden_size],
+uq = tf.get_variable("uq", shape=[3,hidden_size, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                       regularizer=regularizer)
-bzq = tf.get_variable("bzq", shape=[hidden_size],initializer=tf.zeros_initializer())
-
-wrq = tf.get_variable("wrq", shape=[word_vec_dim, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-urq = tf.get_variable("urq", shape=[hidden_size, hidden_size],
-                      initializer=tf.contrib.layers.xavier_initializer(),
-                      regularizer=regularizer)
-brq = tf.get_variable("brq", shape=[hidden_size],initializer=tf.zeros_initializer())
-
-wq = tf.get_variable("wq", shape=[word_vec_dim, hidden_size],
-                     initializer=tf.contrib.layers.xavier_initializer(),
-                     regularizer=regularizer)
-uq = tf.get_variable("uq", shape=[hidden_size, hidden_size],
-                     initializer=tf.contrib.layers.xavier_initializer(),
-                     regularizer=regularizer)
-bq = tf.get_variable("bq", shape=[hidden_size],initializer=tf.zeros_initializer())
+bq = tf.get_variable("bq", shape=[3,hidden_size],initializer=tf.zeros_initializer())
 
 
 # EPISODIC MEMORY
+
+# ATTENTION MECHANISM
 
 inter_neurons = 1024
 
@@ -334,41 +289,28 @@ w2 = tf.get_variable("w2", shape=[inter_neurons,1],
                      regularizer=regularizer)
 b2 = tf.get_variable("b2", shape=[1],initializer=tf.zeros_initializer())
 
+
 # ATTENTION BASED GRU PARAMETERS
 
-wratt = tf.get_variable("wratt", shape=[hidden_size,hidden_size],
-                        initializer=tf.contrib.layers.xavier_initializer(),
-                        regularizer=regularizer)
-uratt = tf.get_variable("uratt", shape=[hidden_size,hidden_size],
-                        initializer=tf.contrib.layers.xavier_initializer(),
-                        regularizer=regularizer)
-bratt = tf.get_variable("bratt", shape=[hidden_size],initializer=tf.zeros_initializer())
-
-watt = tf.get_variable("watt", shape=[hidden_size,hidden_size],
+watt = tf.get_variable("watt", shape=[2,hidden_size,hidden_size],
                        initializer=tf.contrib.layers.xavier_initializer(),
                        regularizer=regularizer)
-uatt = tf.get_variable("uatt", shape=[hidden_size, hidden_size],
+uatt = tf.get_variable("uatt", shape=[2,hidden_size, hidden_size],
                       initializer=tf.contrib.layers.xavier_initializer(),
                        regularizer=regularizer)
-batt = tf.get_variable("batt", shape=[hidden_size],initializer=tf.zeros_initializer())
+batt = tf.get_variable("batt", shape=[2,hidden_size],initializer=tf.zeros_initializer())
 
 
 # MEMORY UPDATE PARAMETERS
 # (UNTIED)
-wt = []
-bt = []
 
-for i in xrange(passes):
-    wt.append(tf.get_variable("wt"+str(i), shape=[hidden_size*3,hidden_size],
+wt = tf.get_variable("wt", shape=[passes,hidden_size*3,hidden_size],
                     initializer=tf.contrib.layers.xavier_initializer(),
-                    regularizer=regularizer))
-    bt.append(tf.get_variable("bt"+str(i), shape=[hidden_size],
-                     initializer=tf.zeros_initializer()))
-
+                    regularizer=regularizer)
+bt = tf.get_variable("bt", shape=[passes,hidden_size],
+                     initializer=tf.zeros_initializer())
 
 # ANSWER MODULE PARAMETERS
-
-# GRU PARAMETERS FOR ANSWER MODULE
 
 wa_pd = tf.get_variable("wa_pd", shape=[hidden_size*2,len(vocab)],
                      initializer=tf.contrib.layers.xavier_initializer(),
@@ -377,18 +319,37 @@ ba_pd = tf.get_variable("ba_pd", shape=[len(vocab)],
                      initializer=tf.zeros_initializer())
 
 
-# ### Low level api implementation of GRU
-# 
-# Returns a tensor of all the hidden states
+# ### Layer Normalization
 
 # In[8]:
 
 
+def layer_norm(inputs,scope,epsilon = 1e-5):
+    
+    with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+        
+        scale = tf.get_variable("scale", shape=[inputs.get_shape()[1]],
+                        initializer=tf.ones_initializer())
+        shift = tf.get_variable("shift", shape=[inputs.get_shape()[1]],
+                        initializer=tf.zeros_initializer())
+        
+    mean, var = tf.nn.moments(inputs, [1], keep_dims=True)
+
+    LN = tf.multiply((scale / tf.sqrt(var + epsilon)),(inputs - mean)) + shift
+ 
+    return LN
+
+
+# ###  GRU Function
+# 
+# Returns a tensor of all the hidden states
+
+# In[9]:
+
+
 def GRU(inp,hidden,
-        wz,uz,bz,
-        wr,ur,br,
         w,u,b,
-        seq_len):
+        seq_len,scope):
 
     hidden_lists = tf.TensorArray(size=seq_len,dtype=tf.float32)
     
@@ -400,11 +361,11 @@ def GRU(inp,hidden,
     def body(i,hidden,hidden_lists):
         
         x = inp[i]
-
+ 
         # GRU EQUATIONS:
-        z = tf.sigmoid( tf.matmul(x,wz) + tf.matmul(hidden,uz) + bz )
-        r = tf.sigmoid( tf.matmul(x,wr) + tf.matmul(hidden,ur) + br )
-        h_ = tf.tanh( tf.matmul(x,w) + tf.multiply(r,tf.matmul(hidden,u)) + b )
+        z = tf.sigmoid(layer_norm( tf.matmul(x,w[0]) + tf.matmul(hidden,u[0]) + b[0], scope+"_z"))
+        r = tf.sigmoid(layer_norm( tf.matmul(x,w[1]) + tf.matmul(hidden,u[1]) + b[1], scope+"_r"))
+        h_ = tf.tanh(layer_norm( tf.matmul(x,w[2]) + tf.multiply(r,tf.matmul(hidden,u[2])) + b[2],scope+"_h"))
         hidden = tf.multiply(z,h_) + tf.multiply((1-z),hidden)
 
         hidden_lists = hidden_lists.write(i,hidden)
@@ -421,13 +382,12 @@ def GRU(inp,hidden,
 # 
 # Returns only the final hidden state.
 
-# In[9]:
+# In[10]:
 
 
 def attention_based_GRU(inp,hidden,
-                        wr,ur,br,
                         w,u,b,
-                        g,seq_len):
+                        g,seq_len,scope):
     
     i=0
     
@@ -439,8 +399,8 @@ def attention_based_GRU(inp,hidden,
         x = inp[i]
 
         # GRU EQUATIONS:
-        r = tf.sigmoid( tf.matmul(x,wr) + tf.matmul(hidden,ur) + br)
-        h_ = tf.tanh( tf.matmul(x,w) + tf.multiply(r,tf.matmul(hidden,u)) + b)
+        r = tf.sigmoid(layer_norm( tf.matmul(x,w[0]) + tf.matmul(hidden,u[0]) + b[0], scope+"_r"))
+        h_ = tf.tanh(layer_norm( tf.matmul(x,w[1]) + tf.multiply(r,tf.matmul(hidden,u[1])) + b[1],scope+"_h"))
         hidden = tf.multiply(g[i],h_) + tf.multiply((1-g[i]),hidden)
         
         return i+1,hidden
@@ -448,12 +408,11 @@ def attention_based_GRU(inp,hidden,
     _,hidden = tf.while_loop(cond,body,[i,hidden])
     
     return hidden
-        
 
 
 # ### Dynamic Memory Network + Model Definition
 
-# In[10]:
+# In[11]:
 
 
 def DMN_plus(tf_facts,tf_questions):
@@ -463,37 +422,35 @@ def DMN_plus(tf_facts,tf_questions):
     question_len = tf.shape(tf_questions)[0]
     
     hidden = tf.zeros([tf_batch_size,hidden_size],tf.float32)
-    
+
     # Input Module
     
-    tf_facts = tf.nn.dropout(tf_facts,keep_prob)
-    
+    #tf_facts = tf.layers.dropout(tf_facts,dropout_rate,training=training)
+
     # input fusion layer 
     # bidirectional GRU
     
     forward = GRU(tf_facts,hidden,
-                  wzf,uzf,bzf,
-                  wrf,urf,brf,
                   wf,uf,bf,
-                  facts_num)
+                  facts_num,"Forward_GRU")
     
     backward = GRU(tf.reverse(tf_facts,[0]),hidden,
-                   wzf,uzf,bzf,
-                   wrf,urf,brf,
-                   wf,uf,bf,
-                   facts_num)
+                   wb,ub,bb,
+                   facts_num,"Backward_GRU")
     
     backward = tf.reverse(backward,[0])
     
-    encoded_input = forward + backward
+    encoded_input = tf.add(forward,backward)
+    
+    encoded_input = tf.layers.dropout(encoded_input,dropout_rate,training=training)
+    
+    # encoded input now shape = facts_num x batch_size x hidden_size
 
     # Question Module
     
     question_representation = GRU(tf_questions,hidden,
-                                  wzq,uzq,bzq,
-                                  wrq,urq,brq,
                                   wq,uq,bq,
-                                  question_len)
+                                  question_len,"Question_GRU")
     
     #question_representation's current shape = question len x batch size x hidden size
     
@@ -514,6 +471,7 @@ def DMN_plus(tf_facts,tf_questions):
     for i in xrange(passes):
         
         # Attention Mechanism
+        
         Z1 = tf.multiply(encoded_input,question_representation)
         Z2 = tf.multiply(encoded_input,episodic_memory)
         Z3 = tf.abs(tf.subtract(encoded_input,question_representation))
@@ -522,19 +480,19 @@ def DMN_plus(tf_facts,tf_questions):
         Z = tf.concat([Z1,Z2,Z3,Z4],2)
         
         Z = tf.reshape(Z,[-1,4*hidden_size])
-        Z = tf.matmul( tf.tanh( tf.matmul(Z,w1) + b1 ),w2 ) + b2
-        Z = tf.reshape(Z,[tf_batch_size,facts_num])
+        Z = tf.matmul( tf.tanh( layer_norm( tf.matmul(Z,w1) + b1, "Attention_Mechanism")),w2 ) + b2
+        Z = layer_norm(Z,"Attention_Mechanism_2")
+        Z = tf.reshape(Z,[tf_batch_size,1,facts_num])
         
         g = tf.nn.softmax(Z)
-        g = tf.reshape(g,[tf_batch_size,facts_num])
-        g = tf.transpose(g,[1,0])
-        g = tf.reshape(g,[facts_num,tf_batch_size,1])
+
+        g = tf.transpose(g,[2,0,1])
         
         context_vector = attention_based_GRU(tf.transpose(encoded_input,[1,0,2]),
                                              hidden,
-                                             wratt,uratt,bratt,
                                              watt,uatt,batt,
-                                             g,facts_num)
+                                             g,facts_num,"Attention_GRU")
+                                             
         
         context_vector = tf.reshape(context_vector,[tf_batch_size,1,hidden_size])
         
@@ -543,7 +501,7 @@ def DMN_plus(tf_facts,tf_questions):
         concated = tf.concat([episodic_memory,context_vector,question_representation],2)
         concated = tf.reshape(concated,[-1,3*hidden_size])
         
-        episodic_memory = tf.nn.relu(tf.matmul(concated,wt[i]) + bt[i])
+        episodic_memory = tf.nn.relu(layer_norm(tf.matmul(concated,wt[i]) + bt[i],"Memory_Update"))
         
         episodic_memory = tf.reshape(episodic_memory,[tf_batch_size,1,hidden_size])
 
@@ -552,14 +510,15 @@ def DMN_plus(tf_facts,tf_questions):
     # (single word answer prediction)
 
     episodic_memory = tf.reshape(episodic_memory,[tf_batch_size,hidden_size])
-    episodic_memory = tf.nn.dropout(episodic_memory,keep_prob)
+    episodic_memory = tf.layers.dropout(episodic_memory,dropout_rate,training=training)
 
     question_representation = tf.reshape(question_representation,[tf_batch_size,hidden_size])
-    question_representation = tf.nn.dropout(question_representation,keep_prob)
+    #question_representation = tf.layers.dropout(question_representation,dropout_rate,training=training)
     
     y_concat = tf.concat([question_representation,episodic_memory],1)
     
-    # Convert to probability distribution
+    # Convert to pre-softmax probability distribution
+    
     y = tf.matmul(y_concat,wa_pd) + ba_pd
     
     return y
@@ -567,7 +526,7 @@ def DMN_plus(tf_facts,tf_questions):
 
 # ### Cost function, Evaluation, Optimization function 
 
-# In[11]:
+# In[12]:
 
 
 model_output = DMN_plus(tf_facts,tf_questions)
@@ -588,7 +547,6 @@ model_output = tf.nn.softmax(model_output)
 #Evaluate model
 correct_pred = tf.equal(tf.cast(tf.argmax(model_output,1),tf.int32),tf_answers)
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-prediction = tf.argmax(model_output,1)
 
 # Initializing the variables
 init = tf.global_variables_initializer()
@@ -596,7 +554,7 @@ init = tf.global_variables_initializer()
 
 # ### Training....
 
-# In[12]:
+# In[13]:
 
 
 with tf.Session() as sess: # Start Tensorflow Session
@@ -610,10 +568,12 @@ with tf.Session() as sess: # Start Tensorflow Session
     val_loss_list=[]
     val_acc_list=[]
     best_val_acc=0
+    best_val_loss=2**30
     prev_val_acc=0
     patience = 20
     impatience = 0
     display_step = 20
+    min_epoch = 50
             
     batch_size = 128
     
@@ -629,12 +589,12 @@ with tf.Session() as sess: # Start Tensorflow Session
         for i in xrange(len(batches_train_questions)):
             
             # Run optimization operation (backpropagation)
-            _,loss,acc,pred = sess.run([optimizer,cost,accuracy,prediction],
+            _,loss,acc = sess.run([optimizer,cost,accuracy],
                                        feed_dict={tf_facts: batches_train_fact_stories[i], 
                                                   tf_questions: batches_train_questions[i], 
                                                   tf_answers: batches_train_answers[i],
-                                                  keep_prob: 0.9})
-        
+                                                  training: True})
+
             total_loss += loss
             total_acc += acc
                 
@@ -655,7 +615,7 @@ with tf.Session() as sess: # Start Tensorflow Session
                                          feed_dict={tf_facts: batches_val_fact_stories[i], 
                                                     tf_questions: batches_val_questions[i], 
                                                     tf_answers: batches_val_answers[i],
-                                                    keep_prob: 1})
+                                                    training: False})
             total_val_loss += val_loss
             total_val_acc += val_acc
                       
@@ -671,19 +631,22 @@ with tf.Session() as sess: # Start Tensorflow Session
         print "Epoch " + str(step) + ", Average Training Loss= " +               "{:.3f}".format(avg_loss) + ", Average Training Accuracy= " +               "{:.3f}%".format(avg_acc*100)+""
         
         impatience += 1
-            
-        if avg_val_acc >= best_val_acc: 
-            impatience = 0
+        
+        if avg_val_acc >= best_val_acc:
             best_val_acc = avg_val_acc
             saver.save(sess, 'DMN_Model_Backup/model.ckpt') 
-            print "Checkpoint created!"  
+            print "Checkpoint created!"
+    
+        if avg_val_loss <= best_val_loss: 
+            impatience=0
+            best_val_loss = avg_val_loss
+
         
-        if impatience > patience:
-            print "\nEarly Stopping since best validation accuracy not increasing for "+str(patience)+" epochs."
+        if impatience > patience and step>min_epoch:
+            print "\nEarly Stopping since best validation loss not decreasing for "+str(patience)+" epochs."
             break
             
         print ""
-        
         step += 1
         
     
@@ -694,7 +657,7 @@ with tf.Session() as sess: # Start Tensorflow Session
     
 
 
-# In[13]:
+# In[14]:
 
 
 #Saving logs about change of training and validation loss and accuracy over epochs in another file.
@@ -710,7 +673,7 @@ file.create_dataset('loss', data=np.array(loss_list))
 file.close()
 
 
-# In[14]:
+# In[15]:
 
 
 import h5py
@@ -741,7 +704,7 @@ plt.xlabel('epoch')
 plt.show()
 
 
-# In[15]:
+# In[16]:
 
 
 with tf.Session() as sess: # Begin session
@@ -765,7 +728,7 @@ with tf.Session() as sess: # Begin session
                                         feed_dict={tf_facts: batches_test_fact_stories[i], 
                                                    tf_questions: batches_test_questions[i], 
                                                    tf_answers: batches_test_answers[i],
-                                                   keep_prob: 1})
+                                                   training: False})
         total_test_loss += test_loss
         total_test_acc += test_acc
                       
