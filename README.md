@@ -21,12 +21,14 @@ This DMN+ Model uses:
 * Attention Based GRU is used in the episodic memory module.
 * A linear layer with ReLu activation is used along with untied weights to update the memory for the next pass. 
 
+I also included layer normalization ([Layer Normalization - Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E. Hinton](https://arxiv.org/abs/1607.06450)) before every activation, baring the pre-activation state of the final layer. 
+
 I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.edu/projects/glove/).
 I used the 100 dimensional embeddings. 
 
 I trained the model on basic induction tasks from [bAbi-tasks dataset](https://research.fb.com/downloads/babi/). 
 
-Hyperparameters are slightly different from the original implementation.
+Hyperparameters are different from the original implementation.
 
 ## Hyperparameters used:
 
@@ -35,7 +37,7 @@ Hyperparameters are slightly different from the original implementation.
 * Learning rate = 0.001
 * Passes = 3
 * Mini Batch Size = 128
-* L2 Regularization = 0.0005
+* L2 Regularization = 0.001
 * Dropout Rate = 0.1
 * Initialization = 0 for biases, Xavier for weights
 
