@@ -21,7 +21,7 @@ This DMN+ Model uses:
 * Attention Based GRU is used in the episodic memory module.
 * A linear layer with ReLu activation is used along with untied weights to update the memory for the next pass. 
 
-I also included layer normalization ([Layer Normalization - Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E. Hinton](https://arxiv.org/abs/1607.06450)) before every activation, baring the pre-activation state of the final layer. 
+I also included layer normalization ([Layer Normalization - Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E. Hinton](https://arxiv.org/abs/1607.06450)) before every activation, barring the pre-activation state of the final layer. 
 
 I used pre-trained GloVe embedding downloaded from [here](https://nlp.stanford.edu/projects/glove/).
 I used the 100 dimensional embeddings. 
