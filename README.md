@@ -78,6 +78,6 @@ This could be due to using different hyperparameters and embeddings, or I may ha
 
 ## Tested on:
 
-* Tensorflow 1.3.1
+* Tensorflow 1.4 
 * Numpy 1.13.3
 * Python 2.7.12
