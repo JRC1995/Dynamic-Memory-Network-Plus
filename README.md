@@ -37,7 +37,7 @@ Hyperparameters are different from the original implementation.
 * Learning rate = 0.001
 * Passes = 3
 * Mini Batch Size = 128
-* L2 Regularization = 0.001
+* L2 Regularization = 0.0001
 * Dropout Rate = 0.1
 * Initialization = 0 for biases, Xavier for weights
 
@@ -64,9 +64,9 @@ experiences the same difficulties, suggesting that the more
 complex memory update component may prevent convergence
 on certain simpler tasks.
 
-My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **50.5% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 49.5**. . 
+My implementation of the model on pretrained 100 dimensional GloVe vectors seems to produce about **51% classification accuracy**  on Test Data for induction tasks (check DMN+.ipynb)...i.e the **classification error is 49%**. . 
 
-The error is less than what the original DMN model acheived (error 55.1) as specified in the paper, but still greater than the errors achieved achieved by the original implementation of the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
+The error is less than what the original DMN model acheived (error 55.1%) as specified in the paper, but still greater than the errors achieved achieved by the original implementation of the improved versions of DMN (DMN1, DMN2, DMN3, DMN+) in the paper.
 
 This could be due to using different hyperparameters and embeddings, or I may have missed something in my implementations.
 
